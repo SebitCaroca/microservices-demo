@@ -1,0 +1,19 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: configserver
+  profiles:
+    active: native # 'git' uses git config files, 'native' uses files available locally
+  cloud:
+    config:
+      server:
+        native:
+          search-locations:
+            - file:./config/infrastructure
+            - file:./config/services
+        git:
+          uri: https://github.com/joshlong/config-repo.git # todo: replace with your own repo
+          default-label: main
+          clone-on-start: true
