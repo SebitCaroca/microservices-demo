@@ -5,7 +5,6 @@ import com.example.services.profileservice.services.ProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,14 +16,8 @@ import java.util.List;
 public class ProfileController {
     private final ProfileService profileService;
 
-    @GetMapping("/me")
-    public ResponseEntity<ProfileEntity> getMyProfile(Authentication authentication) {
-        String userId = authentication.getName(); // extracts "sub" claim from JWT
-        return ResponseEntity.ok(profileService.getOrCreateProfile(userId));
-    }
-
     @GetMapping("/{userId}")
-    @PreAuthorize("hasRole('ADMIN') or #userId == authentication.name")
+    @PreAuthorize("hasRole('ADMIN') or #userId == authentication.name") // ADMIN or SELF
     public ResponseEntity<ProfileEntity> getProfileById(@PathVariable String userId) {
         return ResponseEntity.ok(profileService.getOrCreateProfile(userId));
     }
@@ -34,4 +27,6 @@ public class ProfileController {
     public ResponseEntity<List<ProfileEntity>> getAllProfiles() {
         return ResponseEntity.ok(profileService.getAll());
     }
+
+    // TODO: UpdateMapping
 }
