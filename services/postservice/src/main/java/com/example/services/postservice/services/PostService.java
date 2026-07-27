@@ -12,6 +12,10 @@ import java.util.List;
 public class PostService {
     private final PostRepository postRepository;
 
+    public List<PostEntity> getAllPosts() {
+        return postRepository.findAll();
+    }
+
     public List<PostEntity> getPostsByPosterId(String posterId) {
         return postRepository.findByPosterId(posterId);
     }
