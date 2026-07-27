@@ -24,7 +24,7 @@ public class ProfileController {
     }
 
     @GetMapping("/{userId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or #userId == authentication.name")
     public ResponseEntity<ProfileEntity> getProfileById(@PathVariable String userId) {
         return ResponseEntity.ok(profileService.getOrCreateProfile(userId));
     }
