@@ -2,7 +2,6 @@
 
 # Build all services and push images to Docker Hub
 docker-push:
-	mvn clean package -DskipTests
 	docker build -t sebitcaroca/demomicro-configserver:latest ./infrastructure/configserver
 	docker build -t sebitcaroca/demomicro-eurekaserver:latest ./infrastructure/eurekaserver
 	docker build -t sebitcaroca/demomicro-gatewayserver:latest ./infrastructure/gatewayserver
