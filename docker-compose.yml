@@ -1,0 +1,95 @@
+services:
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-root}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    ports:
+      - "5432:5432"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    environment:
+      KEYCLOAK_ADMIN: ${KC_ADMIN:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD:-admin}
+    command: start-dev
+    ports:
+      - "9090:8080"
+    depends_on:
+      - postgres
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  configserver:
+    profiles: [full]
+    image: sebitcaroca/demomicro-configserver:latest
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./config:/config
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  eurekaserver:
+    profiles: [full]
+    image: sebitcaroca/demomicro-eurekaserver:latest
+    ports:
+      - "8761:8761"
+    depends_on:
+      - configserver
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+
+  gatewayserver:
+    profiles: [full]
+    image: sebitcaroca/demomicro-gatewayserver:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eurekaserver
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+
+  profileservice:
+    profiles: [full]
+    image: sebitcaroca/demomicro-profileservice:latest
+    depends_on:
+      - postgres
+      - eurekaserver
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-root}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  postservice:
+    profiles: [full]
+    image: sebitcaroca/demomicro-postservice:latest
+    depends_on:
+      - postgres
+      - eurekaserver
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-root}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  postgres_data:

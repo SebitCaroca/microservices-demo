@@ -1,0 +1,2 @@
+CREATE DATABASE db_profile;
+CREATE DATABASE db_post;
