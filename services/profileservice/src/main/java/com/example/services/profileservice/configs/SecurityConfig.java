@@ -19,7 +19,10 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/api/v1/profiles/**").permitAll()
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/v1/profiles",
+                                "/api/v1/profiles/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
