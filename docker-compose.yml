@@ -88,6 +88,12 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: on-failure
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fsS http://localhost:8080/actuator/health | grep UP" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
   profileservice:
     profiles: [full]
