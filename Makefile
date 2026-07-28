@@ -23,11 +23,11 @@ docker-pull:
 
 # Start all containers
 docker-up:
-	docker-compose --profile full up -d
+	docker compose --profile full up -d
 
 # Stop all containers
 docker-down:
-	docker-compose --profile full down
+	docker compose --profile full down
 
 # Deploy to Kubernetes
 k8s-up:
