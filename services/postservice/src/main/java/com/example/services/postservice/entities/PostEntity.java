@@ -1,6 +1,7 @@
 package com.example.services.postservice.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Entity
@@ -15,5 +16,7 @@ public class PostEntity {
     private Long id;
 
     private String posterId;
+
+    @NotBlank(message = "Message cannot be blank")
     private String message;
 }

@@ -3,13 +3,16 @@ package com.example.services.postservice.controllers;
 import com.example.services.postservice.dtos.PostResponseDto;
 import com.example.services.postservice.entities.PostEntity;
 import com.example.services.postservice.services.PostService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/posts")
@@ -21,8 +24,12 @@ public class PostController {
     // ----------------------------------------------------------------------------------------------------
 
     @GetMapping
-    public ResponseEntity<List<PostEntity>> getAllPosts() {
-        return ResponseEntity.ok(postService.getAllPosts());
+    public ResponseEntity<List<PostResponseDto>> getAllPosts() {
+        return ResponseEntity.ok(
+                postService.getAllPosts().stream()
+                        .map(postService::createPostResponseDto)
+                        .collect(Collectors.toList())
+        );
     }
 
     @GetMapping("/{postId}")
@@ -36,8 +43,10 @@ public class PostController {
         return ResponseEntity.ok(postService.getPostsByPosterId(posterId));
     }
 
-    @PostMapping("/create-post")
-    public ResponseEntity<PostEntity> createPost(@RequestBody PostEntity post) {
+    @PostMapping
+    public ResponseEntity<PostEntity> createPost(@Valid @RequestBody PostEntity post, Authentication authentication) {
+        post.setId(null);
+        post.setPosterId(authentication.getName());
         return ResponseEntity.ok(postService.createOrUpdatePost(post));
     }
 

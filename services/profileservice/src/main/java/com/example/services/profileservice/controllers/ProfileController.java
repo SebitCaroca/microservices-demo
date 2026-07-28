@@ -4,6 +4,8 @@ import com.example.services.profileservice.entities.ProfileEntity;
 import com.example.services.profileservice.services.ProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +19,7 @@ public class ProfileController {
     private final ProfileService profileService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<ProfileEntity>> getAllProfiles() {
         return ResponseEntity.ok(profileService.getAll());
     }
@@ -35,10 +38,11 @@ public class ProfileController {
     }
 
     @PostMapping
-    public ResponseEntity<ProfileEntity> createEmptyProfile(String iamId) {
+    public ResponseEntity<ProfileEntity> createEmptyProfile(Authentication authentication) {
+        String iamId = authentication.getName();
         ProfileEntity newProfile = new ProfileEntity();
         newProfile.setIamId(iamId);
-        newProfile.setDisplayName("User " + iamId);
+        newProfile.setDisplayName("User_" + iamId.substring(0,8));
         return ResponseEntity.ok(profileService.saveProfile(newProfile));
     }
 
