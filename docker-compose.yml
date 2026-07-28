@@ -12,6 +12,11 @@ services:
       - "5432:5432"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   keycloak:
     image: quay.io/keycloak/keycloak:latest
@@ -39,6 +44,12 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: on-failure
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8888/actuator/health | grep UP"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
 
   eurekaserver:
     profiles: [full]
@@ -47,13 +58,19 @@ services:
       - "8761:8761"
     depends_on:
       configserver:
-        condition: service_started
+        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: docker
       CONFIG_HOST: configserver
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: on-failure
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8761/actuator/health | grep UP"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
   gatewayserver:
     profiles: [full]
@@ -61,8 +78,10 @@ services:
     ports:
       - "8080:8080"
     depends_on:
+      configserver:
+        condition: service_healthy
       eurekaserver:
-        condition: service_started
+        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: docker
       CONFIG_HOST: configserver
@@ -74,10 +93,12 @@ services:
     profiles: [full]
     image: sebitcaroca/demomicro-profileservice:latest
     depends_on:
+      configserver:
+        condition: service_healthy
       postgres:
-        condition: service_started
+        condition: service_healthy
       eurekaserver:
-        condition: service_started
+        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: docker
       CONFIG_HOST: configserver
@@ -91,10 +112,12 @@ services:
     profiles: [full]
     image: sebitcaroca/demomicro-postservice:latest
     depends_on:
+      configserver:
+        condition: service_healthy
       postgres:
-        condition: service_started
+        condition: service_healthy
       eurekaserver:
-        condition: service_started
+        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: docker
       CONFIG_HOST: configserver
