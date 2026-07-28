@@ -47,7 +47,7 @@ public class PostController {
     public ResponseEntity<PostEntity> createPost(@Valid @RequestBody PostEntity post, Authentication authentication) {
         post.setId(null);
         post.setPosterId(authentication.getName());
-        return ResponseEntity.ok(postService.createOrUpdatePost(post));
+        return ResponseEntity.ok(postService.savePost(post));
     }
 
     // TODO: UpdateMapping

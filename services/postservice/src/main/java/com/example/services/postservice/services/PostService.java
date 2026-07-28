@@ -60,7 +60,7 @@ public class PostService {
     }
 
     // identity is verified through Security, so no need to create a separate update method
-    public PostEntity createOrUpdatePost(PostEntity post) {
+    public PostEntity savePost(PostEntity post) {
         return postRepository.save(post);
     }
 
