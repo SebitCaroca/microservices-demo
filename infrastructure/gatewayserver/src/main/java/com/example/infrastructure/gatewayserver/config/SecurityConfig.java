@@ -2,30 +2,44 @@ package com.example.infrastructure.gatewayserver.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
 @Configuration
-@EnableWebSecurity
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    @Order(1)
+    public SecurityFilterChain publicSecurityFilterChain(HttpSecurity http) throws Exception {
         PathPatternRequestMatcher.Builder matcherBuilder = PathPatternRequestMatcher.withDefaults();
 
         http
+                .securityMatchers(matchers -> matchers
+                        .requestMatchers(
+                                matcherBuilder.matcher(HttpMethod.GET, "/actuator/health"),
+                                matcherBuilder.matcher(HttpMethod.GET, "/actuator/health/**"),
+                                matcherBuilder.matcher(HttpMethod.GET, "/api/v1/posts"),
+                                matcherBuilder.matcher(HttpMethod.GET, "/api/v1/posts/**")
+                        )
+                )
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(matcherBuilder.matcher(HttpMethod.GET, "/actuator/health")).permitAll()
-                        .requestMatchers(matcherBuilder.matcher(HttpMethod.GET, "/actuator/health/**")).permitAll()
-                        .requestMatchers(matcherBuilder.matcher(HttpMethod.GET, "/api/v1/posts")).permitAll()
-                        .requestMatchers(matcherBuilder.matcher(HttpMethod.GET, "/api/v1/posts/**")).permitAll()
-                        .requestMatchers(matcherBuilder.matcher(HttpMethod.GET, "/api/v1/profiles")).permitAll()
-                        .requestMatchers(matcherBuilder.matcher(HttpMethod.GET, "/api/v1/profiles/**")).permitAll()
+                        .anyRequest().permitAll()
+                );
+
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
+    public SecurityFilterChain authenticatedSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
