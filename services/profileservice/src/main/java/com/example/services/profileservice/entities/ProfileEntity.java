@@ -15,7 +15,7 @@ public class ProfileEntity {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private String userId; // for Keycloak
+    private String iamId; // for Keycloak or whatever other IAM system is used.
 
     private String displayName;
     private String avatarUrl;

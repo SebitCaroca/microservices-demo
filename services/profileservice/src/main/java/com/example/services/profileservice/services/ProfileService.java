@@ -19,16 +19,15 @@ public class ProfileService {
         return profileRepository.findAll();
     }
 
-    public ProfileEntity getOrCreateProfile(String userId) {
-        return profileRepository.findByUserId(userId).orElseGet(() -> {
-            ProfileEntity profile = new ProfileEntity();
-            profile.setUserId(userId);
-            profile.setDisplayName("User " + userId); // Most definitely a security concern, but doesn't matter for a demo.
-            return profileRepository.save(profile);
-        });
+    public Optional<ProfileEntity> getProfileById(Long id) {
+        return profileRepository.findById(id);
     }
 
-    public ProfileEntity updateProfile(ProfileEntity profile) {
+    public Optional<ProfileEntity> getProfileByIamId(String iamId) {
+        return profileRepository.findByIamId(iamId);
+    }
+
+    public ProfileEntity saveProfile(ProfileEntity profile) {
         return profileRepository.save(profile);
     }
 }

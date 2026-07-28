@@ -1,5 +1,6 @@
 package com.example.services.postservice.controllers;
 
+import com.example.services.postservice.dtos.PostResponseDto;
 import com.example.services.postservice.entities.PostEntity;
 import com.example.services.postservice.services.PostService;
 import lombok.RequiredArgsConstructor;
@@ -17,14 +18,22 @@ import java.util.Optional;
 public class PostController {
     private final PostService postService;
 
+    // ----------------------------------------------------------------------------------------------------
+
     @GetMapping
     public ResponseEntity<List<PostEntity>> getAllPosts() {
         return ResponseEntity.ok(postService.getAllPosts());
     }
 
-    @GetMapping("/by-user/{userId}")
-    public ResponseEntity<List<PostEntity>> getPostsByUser(@PathVariable  String userId) {
-        return ResponseEntity.ok(postService.getPostsByPosterId(userId));
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostEntity> getPostById(@PathVariable Long postId) {
+        Optional<PostEntity> found = postService.getPostById(postId);
+        return found.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/by-user/{posterId}")
+    public ResponseEntity<List<PostEntity>> getPostsByPosterId(@PathVariable  String posterId) {
+        return ResponseEntity.ok(postService.getPostsByPosterId(posterId));
     }
 
     @PostMapping("/create-post")
@@ -43,4 +52,6 @@ public class PostController {
         postService.deletePost(postId);
         return ResponseEntity.noContent().build();
     }
+
+    // ----------------------------------------------------------------------------------------------------
 }
