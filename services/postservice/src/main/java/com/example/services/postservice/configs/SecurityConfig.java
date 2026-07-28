@@ -2,6 +2,7 @@ package com.example.services.postservice.configs;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -13,6 +14,21 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+
+    @Bean
+    @Order(1)
+    public SecurityFilterChain publicSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatchers(matchers -> matchers
+                        .requestMatchers(HttpMethod.GET, "/api/v1/posts", "/api/v1/posts/**")
+                )
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+
+        return http.build();
+    }
+
+    /* something's going on here thats denying all get from posts... if this doesn't work idk what will.
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -38,4 +54,6 @@ public class SecurityConfig {
         jwtConverter.setJwtGrantedAuthoritiesConverter(new KeycloakRoleConverter());
         return jwtConverter;
     }
+
+    */
 }
