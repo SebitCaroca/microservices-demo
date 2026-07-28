@@ -35,7 +35,8 @@ services:
     volumes:
       - ./config:/config
     environment:
-      SPRING_PROFILES_ACTIVE: docker
+      SPRING_PROFILES_ACTIVE: native,docker
+      CONFIG_HOST: configserver
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -48,6 +49,7 @@ services:
       - configserver
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      CONFIG_HOST: configserver
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -61,6 +63,7 @@ services:
       - eurekaserver
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      CONFIG_HOST: configserver
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -73,6 +76,7 @@ services:
       - eurekaserver
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      CONFIG_HOST: configserver
       DB_USER: ${DB_USER:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-root}
     extra_hosts:
@@ -86,6 +90,7 @@ services:
       - eurekaserver
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      CONFIG_HOST: configserver
       DB_USER: ${DB_USER:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-root}
     extra_hosts:
