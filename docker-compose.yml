@@ -13,7 +13,6 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
-
   keycloak:
     image: quay.io/keycloak/keycloak:latest
     environment:
@@ -39,6 +38,12 @@ services:
       CONFIG_HOST: configserver
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8888/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   eurekaserver:
     profiles: [full]
@@ -46,13 +51,19 @@ services:
     ports:
       - "8761:8761"
     depends_on:
-      - configserver
+      configserver:
+        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: docker
       CONFIG_HOST: configserver
     extra_hosts:
       - "host.docker.internal:host-gateway"
-
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   gatewayserver:
     profiles: [full]
@@ -60,20 +71,22 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - eurekaserver
+      eurekaserver:
+        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: docker
       CONFIG_HOST: configserver
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
-
   profileservice:
     profiles: [full]
     image: sebitcaroca/demomicro-profileservice:latest
     depends_on:
-      - postgres
-      - eurekaserver
+      postgres:
+        condition: service_started
+      eurekaserver:
+        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: docker
       CONFIG_HOST: configserver
@@ -86,8 +99,10 @@ services:
     profiles: [full]
     image: sebitcaroca/demomicro-postservice:latest
     depends_on:
-      - postgres
-      - eurekaserver
+      postgres:
+        condition: service_started
+      eurekaserver:
+        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: docker
       CONFIG_HOST: configserver
