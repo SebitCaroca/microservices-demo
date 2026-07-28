@@ -13,11 +13,11 @@ spring:
         - id: profile-service
           uri: lb://profileservice
           predicates:
-            - Path=/api/v1/profiles/**
+            - Path=/api/v1/profiles,/api/v1/profiles/**
         - id: post-service
           uri: lb://postservice
           predicates:
-            - Path=/api/v1/posts/**
+            - Path=/api/v1/posts,/api/v1/posts/**
 
 eureka:
   client:
