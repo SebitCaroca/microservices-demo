@@ -23,7 +23,8 @@ public class SecurityConfig {
                                 matcherBuilder.matcher(HttpMethod.GET, "/actuator/health"),
                                 matcherBuilder.matcher(HttpMethod.GET, "/actuator/health/**"),
                                 matcherBuilder.matcher(HttpMethod.GET, "/api/v1/posts"),
-                                matcherBuilder.matcher(HttpMethod.GET, "/api/v1/posts/**")
+                                matcherBuilder.matcher(HttpMethod.GET, "/api/v1/posts/**"),
+                                matcherBuilder.matcher("/error")
                         )
                 )
                 .csrf(csrf -> csrf.disable())
