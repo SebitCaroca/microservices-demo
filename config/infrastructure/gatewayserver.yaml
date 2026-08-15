@@ -24,7 +24,6 @@ spring:
             uri: lb://postservice
             predicates:
               - Path=/api/v1/posts,/api/v1/posts/**
-              - Path=/api/v1/profiles,/api/v1/profiles/**
 
 eureka:
   client:
