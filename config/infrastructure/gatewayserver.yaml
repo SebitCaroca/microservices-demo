@@ -5,6 +5,8 @@ logging:
   level:
     org.springframework.security: DEBUG
     org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.gateway.mvc: DEBUG
+    org.springframework.web.servlet: DEBUG
 
 spring:
   security:
